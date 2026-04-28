@@ -15,6 +15,13 @@ class LoginResponse(BaseModel):
     role: str
 
 
+class SignupRequest(BaseModel):
+    name: str = Field(min_length=2, max_length=100)
+    email: EmailStr
+    password: str = Field(min_length=6, max_length=100)
+    role: str = Field(pattern="^(owner|customer)$")
+
+
 class UserOut(BaseModel):
     id: int
     name: str

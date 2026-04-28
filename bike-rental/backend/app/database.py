@@ -1,8 +1,8 @@
 import os
+from urllib.parse import quote
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
-from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 load_dotenv()
@@ -12,21 +12,25 @@ DATABASE_URL = os.getenv(
     "postgresql://postgres:postgres@localhost:5432/bike_rental_db",
 )
 
-SQLITE_FALLBACK_URL = "sqlite:///./bike_rental.db"
-
-
 def _build_engine():
-    primary_engine = create_engine(DATABASE_URL)
-    try:
-        with primary_engine.connect() as conn:
-            conn.execute(text("SELECT 1"))
-        return primary_engine
-    except OperationalError:
-        # Local development fallback when PostgreSQL credentials are not valid.
-        return create_engine(
-            SQLITE_FALLBACK_URL,
-            connect_args={"check_same_thread": False},
-        )
+    if not DATABASE_URL.startswith("postgresql"):
+        raise RuntimeError("DATABASE_URL must use a PostgreSQL connection string.")
+    normalized_url = DATABASE_URL
+    # Accept passwords containing "@" in local .env by safely encoding it.
+    if normalized_url.count("@") > 1:
+        scheme, remainder = normalized_url.split("://", maxsplit=1)
+        authority, *path_parts = remainder.split("/", maxsplit=1)
+        userinfo, hostinfo = authority.rsplit("@", maxsplit=1)
+        if ":" in userinfo:
+            username, raw_password = userinfo.split(":", maxsplit=1)
+            encoded_password = quote(raw_password, safe="")
+            authority = f"{username}:{encoded_password}@{hostinfo}"
+            path = f"/{path_parts[0]}" if path_parts else ""
+            normalized_url = f"{scheme}://{authority}{path}"
+    engine = create_engine(normalized_url)
+    with engine.connect() as conn:
+        conn.execute(text("SELECT 1"))
+    return engine
 
 
 engine = _build_engine()

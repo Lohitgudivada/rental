@@ -13,36 +13,28 @@ def verify_password(password: str, password_hash: str) -> bool:
 
 
 def seed_initial_data(db: Session):
-    admin = db.query(User).filter(User.email == "admin@bike.com").first()
-    owner = db.query(User).filter(User.email == "owner@bike.com").first()
-    customer = db.query(User).filter(User.email == "customer@bike.com").first()
+    def upsert_user(name: str, email: str, password: str, role: str) -> User:
+        user = db.query(User).filter(User.email == email).first()
+        if not user:
+            user = User(
+                name=name,
+                email=email,
+                password_hash=hash_password(password),
+                role=role,
+            )
+            db.add(user)
+            return user
 
-    if not admin:
-        admin = User(
-            name="Admin User",
-            email="admin@bike.com",
-            password_hash=hash_password("admin123"),
-            role="admin",
-        )
-        db.add(admin)
+        # Keep demo credentials reliable for QA/testing environments.
+        user.name = name
+        user.password_hash = hash_password(password)
+        user.role = role
+        user.is_active = True
+        return user
 
-    if not owner:
-        owner = User(
-            name="Owner User",
-            email="owner@bike.com",
-            password_hash=hash_password("owner123"),
-            role="owner",
-        )
-        db.add(owner)
-
-    if not customer:
-        customer = User(
-            name="Customer User",
-            email="customer@bike.com",
-            password_hash=hash_password("customer123"),
-            role="customer",
-        )
-        db.add(customer)
+    admin = upsert_user("Admin User", "admin@bike.com", "admin123", "admin")
+    owner = upsert_user("Owner User", "owner@bike.com", "owner123", "owner")
+    customer = upsert_user("Customer User", "customer@bike.com", "customer123", "customer")
 
     db.commit()
     db.refresh(owner)

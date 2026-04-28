@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import date, datetime
 
-from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, Column, Date, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -28,6 +28,8 @@ class Bike(Base):
     description = Column(Text, nullable=False)
     price_per_day = Column(Float, nullable=False)
     is_available = Column(Boolean, default=True)
+    image_url = Column(String(255), nullable=False, default="")
+    quantity = Column(Integer, nullable=False, default=1)
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     owner = relationship("User", back_populates="bikes")
@@ -40,7 +42,11 @@ class Booking(Base):
     id = Column(Integer, primary_key=True, index=True)
     bike_id = Column(Integer, ForeignKey("bikes.id"), nullable=False)
     customer_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    days = Column(Integer, nullable=False)
+    from_date = Column(Date, nullable=False)
+    to_date = Column(Date, nullable=False)
+    pickup_slot = Column(String(50), nullable=False)
+    quantity = Column(Integer, nullable=False, default=1)
+    rental_days = Column(Integer, nullable=False)
     total_price = Column(Float, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 

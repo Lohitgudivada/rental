@@ -18,7 +18,9 @@ def add_bike(
         name=payload.name,
         description=payload.description,
         price_per_day=payload.price_per_day,
-        is_available=payload.is_available,
+        image_url=payload.image_url,
+        quantity=payload.quantity,
+        is_available=payload.is_available and payload.quantity > 0,
         owner_id=owner.id,
     )
     db.add(bike)

@@ -12,6 +12,10 @@ DATABASE_URL = os.getenv(
     "postgresql://postgres:postgres@localhost:5432/bike_rental_db",
 )
 
+SQLITE_FALLBACK_URL = "sqlite:///./bike_rental.db"
+ENABLE_SQLITE_FALLBACK = os.getenv("ENABLE_SQLITE_FALLBACK", "false").lower() == "true"
+
+
 def _build_engine():
     if not DATABASE_URL.startswith("postgresql"):
         raise RuntimeError("DATABASE_URL must use a PostgreSQL connection string.")
@@ -33,6 +37,13 @@ def _build_engine():
     return engine
 
 
-engine = _build_engine()
+def build_fallback_engine():
+    return create_engine(
+        SQLITE_FALLBACK_URL,
+        connect_args={"check_same_thread": False},
+    )
+
+
+engine = build_fallback_engine() if ENABLE_SQLITE_FALLBACK else _build_engine()
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

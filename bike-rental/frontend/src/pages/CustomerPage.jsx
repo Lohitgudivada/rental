@@ -4,11 +4,14 @@ import {
   Button,
   Card,
   CardContent,
+  Chip,
   Container,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  MenuItem,
+  Stack,
   TextField,
   Typography,
 } from "@mui/material";
@@ -18,19 +21,32 @@ import BikeCard from "../components/BikeCard";
 
 function CustomerPage({ bikes, bookings, onBookBike }) {
   const [selectedBike, setSelectedBike] = useState(null);
-  const [days, setDays] = useState(1);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [pickupSlot, setPickupSlot] = useState("09:00 - 11:00");
+  const [quantity, setQuantity] = useState(1);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const pickupSlots = ["09:00 - 11:00", "11:00 - 13:00", "14:00 - 16:00", "16:00 - 18:00"];
 
   const handleBook = async () => {
     if (!selectedBike) return;
     setMessage("");
     setError("");
     try {
-      await onBookBike({ bike_id: selectedBike.id, days: Number(days) });
+      await onBookBike({
+        bike_id: selectedBike.id,
+        from_date: fromDate,
+        to_date: toDate,
+        pickup_slot: pickupSlot,
+        quantity: Number(quantity),
+      });
       setMessage("Bike booked successfully.");
       setSelectedBike(null);
-      setDays(1);
+      setFromDate("");
+      setToDate("");
+      setPickupSlot("09:00 - 11:00");
+      setQuantity(1);
     } catch (apiError) {
       setError(apiError.response?.data?.detail || "Failed to book bike.");
     }
@@ -59,10 +75,18 @@ function CustomerPage({ bikes, bookings, onBookBike }) {
           <Box key={booking.id} sx={{ flex: "1 1 300px" }}>
             <Card>
               <CardContent>
-                <Typography>Booking ID: {booking.id}</Typography>
-                <Typography>Bike ID: {booking.bike_id}</Typography>
-                <Typography>Days: {booking.days}</Typography>
-                <Typography>Total: ${booking.total_price}</Typography>
+                <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+                  <Chip size="small" label={`Booking #${booking.id}`} />
+                  <Chip size="small" color="primary" label={`${booking.rental_days ?? "-"} days`} />
+                </Stack>
+                <Typography variant="subtitle1">{booking.bike_name || `Bike #${booking.bike_id}`}</Typography>
+                <Typography color="text.secondary">Customer: {booking.customer_name || `User #${booking.customer_id}`}</Typography>
+                <Typography>
+                  Dates: {booking.from_date || "-"} to {booking.to_date || "-"}
+                </Typography>
+                <Typography>Pickup slot: {booking.pickup_slot || "-"}</Typography>
+                <Typography>Quantity: {booking.quantity ?? 1}</Typography>
+                <Typography sx={{ fontWeight: 600 }}>Total: ${booking.total_price}</Typography>
               </CardContent>
             </Card>
           </Box>
@@ -73,13 +97,46 @@ function CustomerPage({ bikes, bookings, onBookBike }) {
         <DialogTitle>Book {selectedBike?.name}</DialogTitle>
         <DialogContent>
           <Box sx={{ mt: 1 }}>
+            <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+              <TextField
+                type="date"
+                fullWidth
+                label="From date"
+                value={fromDate}
+                onChange={(event) => setFromDate(event.target.value)}
+                InputLabelProps={{ shrink: true }}
+              />
+              <TextField
+                type="date"
+                fullWidth
+                label="To date"
+                value={toDate}
+                onChange={(event) => setToDate(event.target.value)}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Stack>
+            <TextField
+              select
+              fullWidth
+              label="Pickup slot"
+              value={pickupSlot}
+              onChange={(event) => setPickupSlot(event.target.value)}
+              sx={{ mt: 2 }}
+            >
+              {pickupSlots.map((slot) => (
+                <MenuItem key={slot} value={slot}>
+                  {slot}
+                </MenuItem>
+              ))}
+            </TextField>
             <TextField
               type="number"
               fullWidth
-              label="Number of days"
-              value={days}
-              onChange={(event) => setDays(event.target.value)}
-              inputProps={{ min: 1 }}
+              sx={{ mt: 2 }}
+              label="Quantity"
+              value={quantity}
+              onChange={(event) => setQuantity(event.target.value)}
+              inputProps={{ min: 1, max: selectedBike?.quantity ?? 1 }}
             />
           </Box>
         </DialogContent>

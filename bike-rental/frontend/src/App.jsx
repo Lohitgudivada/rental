@@ -59,8 +59,10 @@ function App() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshDataByRole().catch(() => {
-      setGlobalError("Could not load data from backend.");
+      // Keep initial render stable even when backend is temporarily unavailable.
+      console.error("Could not load data from backend.");
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
@@ -98,7 +100,14 @@ function App() {
   };
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#f5f7fb" }}>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        bgcolor: "#eef3ff",
+        backgroundImage:
+          "radial-gradient(circle at 8% 10%, rgba(58, 123, 213, 0.18), transparent 26%), radial-gradient(circle at 85% 5%, rgba(0, 210, 255, 0.18), transparent 30%)",
+      }}
+    >
       <Navbar user={user} onLogout={handleLogout} />
       {globalError ? (
         <Container sx={{ mt: 2 }}>
@@ -113,7 +122,7 @@ function App() {
       ) : null}
       {user?.role === "owner" ? <OwnerPage bikes={ownerBikes} onAddBike={handleAddBike} /> : null}
       {user?.role === "customer" ? (
-        <CustomerPage bikes={bikes.filter((bike) => bike.is_available)} bookings={bookings} onBookBike={handleBookBike} />
+        <CustomerPage bikes={bikes.filter((bike) => bike.is_available && (bike.quantity ?? 0) > 0)} bookings={bookings} onBookBike={handleBookBike} />
       ) : null}
       {user?.role === "admin" ? <AdminPage overview={overview} /> : null}
     </Box>

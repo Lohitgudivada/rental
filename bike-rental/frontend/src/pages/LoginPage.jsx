@@ -12,9 +12,9 @@ function LoginPage({ onLogin, error, isLoading }) {
 
   return (
     <Container maxWidth="sm" sx={{ mt: 6 }}>
-      <Paper sx={{ p: 4 }}>
-        <Typography variant="h5" sx={{ mb: 2 }}>
-          Login
+      <Paper sx={{ p: 4, borderRadius: 4, backdropFilter: "blur(6px)", bgcolor: "rgba(255,255,255,0.92)" }}>
+        <Typography variant="h5" sx={{ mb: 1, fontWeight: 700 }}>
+          Premium Bike Booking
         </Typography>
         <Typography color="text.secondary" sx={{ mb: 2 }}>
           Use sample users: admin@bike.com, owner@bike.com, customer@bike.com

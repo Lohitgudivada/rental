@@ -102,7 +102,11 @@ function App() {
       setUserHeader(data.id);
       setGlobalError("");
     } catch (error) {
-      setLoginError(error.response?.data?.detail || "Login failed.");
+      if (!error.response) {
+        setLoginError("Cannot reach server. Please start backend on port 8000.");
+      } else {
+        setLoginError(error.response?.data?.detail || "Login failed.");
+      }
     } finally {
       setLoading(false);
     }
@@ -116,7 +120,11 @@ function App() {
       await signupApi(payload);
       setSuccessMessage("Account created successfully. You can now login.");
     } catch (error) {
-      setLoginError(error.response?.data?.detail || "Signup failed.");
+      if (!error.response) {
+        setLoginError("Cannot reach server. Please start backend on port 8000.");
+      } else {
+        setLoginError(error.response?.data?.detail || "Signup failed.");
+      }
     } finally {
       setLoading(false);
     }

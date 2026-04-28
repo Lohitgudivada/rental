@@ -36,6 +36,8 @@ function LoginPage({ onLogin, onSignup, error, successMessage, isLoading }) {
           borderRadius: 5,
           border: "1px solid",
           borderColor: "divider",
+          background:
+            "linear-gradient(135deg, rgba(47,107,255,0.08) 0%, rgba(0,169,184,0.08) 50%, rgba(255,182,72,0.1) 100%)",
           display: "grid",
           gridTemplateColumns: { xs: "1fr", md: "1.3fr 1fr" },
           gap: 4,
@@ -52,15 +54,15 @@ function LoginPage({ onLogin, onSignup, error, successMessage, isLoading }) {
             Professional rentals for owners and riders. Track fleet availability, bookings, and customer activity in one modern dashboard.
           </Typography>
           <Box sx={{ mt: 4, display: "flex", gap: 2, flexWrap: "wrap" }}>
-            <Paper variant="outlined" sx={{ px: 2, py: 1.5, borderRadius: 2 }}>
+            <Paper variant="outlined" sx={{ px: 2, py: 1.5, borderRadius: 2, bgcolor: "rgba(47,107,255,0.08)" }}>
               <Typography variant="subtitle2">350+ bikes</Typography>
               <Typography variant="caption" color="text.secondary">Live availability</Typography>
             </Paper>
-            <Paper variant="outlined" sx={{ px: 2, py: 1.5, borderRadius: 2 }}>
+            <Paper variant="outlined" sx={{ px: 2, py: 1.5, borderRadius: 2, bgcolor: "rgba(0,169,184,0.08)" }}>
               <Typography variant="subtitle2">24/7 support</Typography>
               <Typography variant="caption" color="text.secondary">Priority service</Typography>
             </Paper>
-            <Paper variant="outlined" sx={{ px: 2, py: 1.5, borderRadius: 2 }}>
+            <Paper variant="outlined" sx={{ px: 2, py: 1.5, borderRadius: 2, bgcolor: "rgba(255,182,72,0.12)" }}>
               <Typography variant="subtitle2">Secure billing</Typography>
               <Typography variant="caption" color="text.secondary">Verified checkout</Typography>
             </Paper>
@@ -86,10 +88,6 @@ function LoginPage({ onLogin, onSignup, error, successMessage, isLoading }) {
 
           {successMessage ? <Alert severity="success">{successMessage}</Alert> : null}
           {error ? <Alert severity="error" sx={{ mt: successMessage ? 1 : 0 }}>{error}</Alert> : null}
-
-          <Typography color="text.secondary" sx={{ mt: 1.5 }}>
-            Test users: admin@bike.com / admin123, owner@bike.com / owner123, customer@bike.com / customer123
-          </Typography>
 
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1.5 }}>
             {view === "signup" ? (

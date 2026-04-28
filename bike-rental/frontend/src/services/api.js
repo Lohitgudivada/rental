@@ -13,6 +13,7 @@ export const setUserHeader = (userId) => {
 };
 
 export const loginApi = (payload) => api.post("/auth/login", payload);
+export const signupApi = (payload) => api.post("/auth/signup", payload);
 export const listBikesApi = () => api.get("/bikes");
 export const addBikeApi = (payload) => api.post("/bikes", payload);
 export const bookBikeApi = (payload) => api.post("/bookings", payload);
